@@ -7,6 +7,7 @@ import (
 
 	"github.com/gofiber/fiber/v2"
 	"github.com/joho/godotenv"
+	"github.com/shafaalafghany/loan-app/middleware"
 	"github.com/shafaalafghany/loan-app/model"
 	"go.uber.org/zap"
 	"go.uber.org/zap/zapcore"
@@ -59,6 +60,8 @@ func main() {
 			"status": "ok",
 		})
 	})
+
+	_ = middleware.JWTMiddleware(config.JwtSecret)
 
 	port := fmt.Sprintf(":%s", config.AppPort)
 	log.Println("Server is running on port ", config.AppPort)
