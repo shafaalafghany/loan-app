@@ -31,6 +31,7 @@ require (
 )
 
 require (
+	github.com/dgrijalva/jwt-go v3.2.0+incompatible
 	github.com/google/uuid v1.6.0
 	go.uber.org/multierr v1.10.0 // indirect
 	gorm.io/driver/postgres v1.5.11
