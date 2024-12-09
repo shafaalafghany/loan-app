@@ -14,5 +14,4 @@ type AuditLog struct {
 	OldValues string    `gorm:"type:jsonb"`
 	NewValues string    `gorm:"type:jsonb"`
 	Timestamp time.Time `gorm:"type:timestamptz;default:CURRENT_TIMESTAMP;"`
-	IPAddress string    `gorm:"type:inet"`
 }
