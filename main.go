@@ -73,6 +73,7 @@ func main() {
 	api := app.Group("/api/v1")
 	auth := api.Group("/auth")
 	auth.Post("/", userHandler.Register)
+	auth.Post("/login", userHandler.Login)
 
 	port := fmt.Sprintf(":%s", config.AppPort)
 	log.Println("Server is running on port ", config.AppPort)
