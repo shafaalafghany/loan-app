@@ -68,12 +68,15 @@ func main() {
 		})
 	})
 
-	_ = middleware.JWTMiddleware(config.JwtSecret)
+	midAuth := middleware.JWTMiddleware(config.JwtSecret)
 
 	api := app.Group("/api/v1")
+
 	auth := api.Group("/auth")
 	auth.Post("/", userHandler.Register)
 	auth.Post("/login", userHandler.Login)
+
+	api.Get("/profile", midAuth, userHandler.Profile)
 
 	port := fmt.Sprintf(":%s", config.AppPort)
 	log.Println("Server is running on port ", config.AppPort)
