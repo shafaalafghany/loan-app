@@ -7,8 +7,11 @@ import (
 
 	"github.com/gofiber/fiber/v2"
 	"github.com/joho/godotenv"
+	"github.com/shafaalafghany/loan-app/handler"
 	"github.com/shafaalafghany/loan-app/middleware"
 	"github.com/shafaalafghany/loan-app/model"
+	"github.com/shafaalafghany/loan-app/repository"
+	"github.com/shafaalafghany/loan-app/service"
 	"go.uber.org/zap"
 	"go.uber.org/zap/zapcore"
 	"gorm.io/driver/postgres"
@@ -40,7 +43,7 @@ func main() {
 
 	logConfig := zap.NewDevelopmentConfig()
 	logConfig.EncoderConfig.EncodeLevel = zapcore.CapitalColorLevelEncoder
-	_, err := logConfig.Build()
+	logger, err := logConfig.Build()
 	if err != nil {
 		panic(err)
 	}
@@ -52,7 +55,11 @@ func main() {
 	}
 
 	db.Exec("CREATE EXTENSION IF NOT EXISTS \"uuid-ossp\"")
-	db.AutoMigrate(&model.User{}, &model.Transaction{}, &model.Limit{})
+	db.AutoMigrate(&model.User{}, &model.Transaction{}, &model.Limit{}, &model.AuditLog{})
+
+	userRepo := repository.NewUserRepository(db, logger)
+	userService := service.NewUserService(userRepo, logger)
+	userHandler := handler.NewUserHandler(userService, logger)
 
 	app := fiber.New()
 	app.Get("/health", func(c *fiber.Ctx) error {
@@ -62,6 +69,10 @@ func main() {
 	})
 
 	_ = middleware.JWTMiddleware(config.JwtSecret)
+
+	api := app.Group("/api/v1")
+	auth := api.Group("/auth")
+	auth.Post("/", userHandler.Register)
 
 	port := fmt.Sprintf(":%s", config.AppPort)
 	log.Println("Server is running on port ", config.AppPort)
