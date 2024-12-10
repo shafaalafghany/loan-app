@@ -30,3 +30,15 @@ func (h *UserHandler) Register(c *fiber.Ctx) error {
 
 	return h.s.Register(c, &user)
 }
+
+func (h *UserHandler) Login(c *fiber.Ctx) error {
+	h.log.Info("incoming request in handler for user login")
+	var req model.UserRequest
+	if err := c.BodyParser(&req); err != nil {
+		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
+			"message": "failed to parsing payload",
+		})
+	}
+
+	return h.s.Login(c, &req)
+}
