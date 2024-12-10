@@ -10,7 +10,7 @@ import (
 type User struct {
 	ID           uuid.UUID      `gorm:"type:uuid;primary_key;" json:"id"`
 	Email        string         `gorm:"type.varchar(100); unique;not null" json:"email"`
-	Password     string         `gorm:"type.varchar(255);not null" json:"password"`
+	Password     string         `gorm:"type.varchar(255);not null" json:"-"`
 	NIK          string         `gorm:"type:varchar(16);unique;not null" json:"nik"`
 	FullName     string         `gorm:"type:varchar(100);not null" json:"full_name"`
 	LegalName    string         `gorm:"type:varchar(100);not null" json:"legal_name"`
@@ -34,4 +34,15 @@ type UserRequest struct {
 	TempatLahir  string    `json:"tempat_lahir"`
 	TanggalLahir time.Time `json:"tanggal_lahir"`
 	Gaji         float64   `json:"gaji"`
+}
+
+type UserLoginRequest struct {
+	Email    string `json:"email"`
+	Password string `json:"password"`
+}
+
+type UserLoginResponse struct {
+	User    User   `json:"data"`
+	Token   string `json:"token"`
+	Message string `json:"message"`
 }
