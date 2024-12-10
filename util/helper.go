@@ -1,6 +1,12 @@
 package util
 
-import "github.com/gofiber/fiber/v2"
+import (
+	"time"
+
+	"github.com/gofiber/fiber/v2"
+	"github.com/google/uuid"
+	"github.com/shafaalafghany/loan-app/model"
+)
 
 func GetUserIdFromToken(c *fiber.Ctx) (string, error) {
 	userId := c.Locals("userId")
@@ -14,4 +20,14 @@ func GetUserIdFromToken(c *fiber.Ctx) (string, error) {
 	}
 
 	return userIdStr, nil
+}
+
+func GetDefaultModelAuditLog(action, resource string, user model.User) *model.AuditLog {
+	return &model.AuditLog{
+		ID:        uuid.New(),
+		UserID:    user.ID,
+		Action:    action,
+		Resource:  resource,
+		Timestamp: time.Now(),
+	}
 }
