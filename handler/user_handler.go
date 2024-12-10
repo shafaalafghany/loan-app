@@ -42,3 +42,9 @@ func (h *UserHandler) Login(c *fiber.Ctx) error {
 
 	return h.s.Login(c, &req)
 }
+
+func (h *UserHandler) Profile(c *fiber.Ctx) error {
+	h.log.Info("income request in handler for get profile")
+
+	return h.s.Profile(c)
+}
