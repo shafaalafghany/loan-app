@@ -11,6 +11,7 @@ import (
 	"github.com/google/uuid"
 	"github.com/shafaalafghany/loan-app/model"
 	"github.com/shafaalafghany/loan-app/repository"
+	"github.com/shafaalafghany/loan-app/util"
 	"go.uber.org/zap"
 	"golang.org/x/crypto/bcrypt"
 	"gorm.io/gorm"
@@ -19,6 +20,7 @@ import (
 type UserServiceInterface interface {
 	Register(*fiber.Ctx, *model.UserRequest) error
 	Login(*fiber.Ctx, *model.UserRequest) error
+	Profile(*fiber.Ctx) error
 }
 
 type UserService struct {
@@ -126,4 +128,24 @@ func (u *UserService) Login(c *fiber.Ctx, data *model.UserRequest) error {
 	}
 
 	return c.Status(fiber.StatusOK).JSON(response)
+}
+
+func (u *UserService) Profile(c *fiber.Ctx) error {
+	u.log.Info("incoming request to get profile")
+	userId, err := util.GetUserIdFromToken(c)
+	if err != nil {
+		return c.Status(fiber.StatusUnauthorized).JSON(fiber.Map{
+			"message": "unauthorized",
+		})
+	}
+
+	data, err := u.repo.GetById(userId)
+	if err != nil {
+		return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{
+			"message": "failed to get user",
+		})
+	}
+
+	return c.Status(fiber.StatusOK).JSON(data)
+
 }
