@@ -1,6 +1,8 @@
 package repository
 
 import (
+	"fmt"
+
 	"github.com/shafaalafghany/loan-app/model"
 	"github.com/shafaalafghany/loan-app/util"
 	"go.uber.org/zap"
@@ -9,6 +11,7 @@ import (
 
 type UserRepositoryInterface interface {
 	Create(*model.User) error
+	GetByEmail(string) (*model.User, error)
 }
 
 type UserRepository struct {
@@ -44,4 +47,15 @@ func (r *UserRepository) Create(data *model.User) error {
 	}
 
 	return nil
+}
+
+func (r *UserRepository) GetByEmail(email string) (*model.User, error) {
+	r.log.Info("getting user data by email", zap.Any("data", email))
+	var user *model.User
+	if err := r.db.Where("email = ? AND deleted_at IS NULL", email).First(&user).Error; err != nil {
+		fmt.Println("ERROR", err)
+		return nil, err
+	}
+
+	return user, nil
 }
