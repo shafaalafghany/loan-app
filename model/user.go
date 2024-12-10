@@ -9,8 +9,8 @@ import (
 
 type User struct {
 	ID           uuid.UUID      `gorm:"type:uuid;primary_key;" json:"id"`
-	Email        string         `gorm:"type.varchar(100);not null" json:"email"`
-	Password     string         `gorm:"type.varchar(255);not null" json:"-"`
+	Email        string         `gorm:"type.varchar(100); unique;not null" json:"email"`
+	Password     string         `gorm:"type.varchar(255);not null" json:"password"`
 	NIK          string         `gorm:"type:varchar(16);unique;not null" json:"nik"`
 	FullName     string         `gorm:"type:varchar(100);not null" json:"full_name"`
 	LegalName    string         `gorm:"type:varchar(100);not null" json:"legal_name"`
@@ -23,4 +23,15 @@ type User struct {
 	CreatedAt    time.Time      `json:"created_at"`
 	UpdatedAt    time.Time      `json:"updated_at"`
 	DeletedAt    gorm.DeletedAt `gorm:"index" json:"-"`
+}
+
+type UserRequest struct {
+	Email        string    `json:"email"`
+	Password     string    `json:"password"`
+	NIK          string    `json:"nik"`
+	FullName     string    `json:"full_name"`
+	LegalName    string    `json:"legal_name"`
+	TempatLahir  string    `json:"tempat_lahir"`
+	TanggalLahir time.Time `json:"tanggal_lahir"`
+	Gaji         float64   `json:"gaji"`
 }
