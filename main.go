@@ -57,8 +57,10 @@ func main() {
 	db.Exec("CREATE EXTENSION IF NOT EXISTS \"uuid-ossp\"")
 	db.AutoMigrate(&model.User{}, &model.Transaction{}, &model.Limit{}, &model.AuditLog{})
 
+	auditLogRepo := repository.NewAuditLogRepository(db, logger)
+
 	userRepo := repository.NewUserRepository(db, logger)
-	userService := service.NewUserService(userRepo, logger)
+	userService := service.NewUserService(userRepo, auditLogRepo, logger)
 	userHandler := handler.NewUserHandler(userService, logger)
 
 	app := fiber.New()
