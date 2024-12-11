@@ -60,6 +60,7 @@ func main() {
 	auditLogRepo := repository.NewAuditLogRepository(db, logger)
 
 	limitRepo := repository.NewLimitRepository(db, logger)
+	limitService := service.NewLimitService(limitRepo, logger)
 
 	userRepo := repository.NewUserRepository(db, logger)
 	userService := service.NewUserService(userRepo, auditLogRepo, logger)
