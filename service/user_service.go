@@ -24,14 +24,16 @@ type UserServiceInterface interface {
 }
 
 type UserService struct {
-	repo repository.UserRepositoryInterface
-	log  *zap.Logger
+	repo         repository.UserRepositoryInterface
+	auditLogRepo repository.AuditLogRepositoryInterface
+	log          *zap.Logger
 }
 
-func NewUserService(repo repository.UserRepositoryInterface, log *zap.Logger) UserServiceInterface {
+func NewUserService(repo repository.UserRepositoryInterface, auditLogRepo repository.AuditLogRepositoryInterface, log *zap.Logger) UserServiceInterface {
 	return &UserService{
-		repo: repo,
-		log:  log,
+		repo:         repo,
+		auditLogRepo: auditLogRepo,
+		log:          log,
 	}
 }
 
@@ -72,6 +74,14 @@ func (u *UserService) Register(c *fiber.Ctx, body *model.UserRequest) error {
 	}
 
 	data.Password = string(hash)
+
+	audit := util.GetDefaultModelAuditLog("create", "user", *data)
+
+	if err := u.auditLogRepo.Add(audit); err != nil {
+		return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{
+			"message": "failed to log",
+		})
+	}
 
 	if err := u.repo.Create(data); err != nil {
 		return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{
