@@ -8,6 +8,7 @@ import (
 
 type LimitRepositoryInterface interface {
 	AddLimits([]*model.Limit) error
+	GetByUserId(string) ([]*model.Limit, error)
 }
 
 type LimitRepository struct {
@@ -29,4 +30,14 @@ func (r *LimitRepository) AddLimits(data []*model.Limit) error {
 	}
 
 	return nil
+}
+
+func (r *LimitRepository) GetByUserId(id string) ([]*model.Limit, error) {
+	var limits []*model.Limit
+	if err := r.db.Where("user_id = ? AND deleted_at IS NULL", id).Find(&limits).Error; err != nil {
+		r.log.Error("failed to get user limit", zap.Error(err))
+		return nil, err
+	}
+
+	return limits, nil
 }
