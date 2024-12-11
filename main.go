@@ -59,6 +59,10 @@ func main() {
 
 	auditLogRepo := repository.NewAuditLogRepository(db, logger)
 
+	limitRepo := repository.NewLimitRepository(db, logger)
+	limitService := service.NewLimitService(limitRepo, logger)
+	limitHandler := handler.NewLimitHandler(limitService, logger)
+
 	userRepo := repository.NewUserRepository(db, logger)
 	userService := service.NewUserService(userRepo, auditLogRepo, logger)
 	userHandler := handler.NewUserHandler(userService, logger)
@@ -79,6 +83,8 @@ func main() {
 	auth.Post("/login", userHandler.Login)
 
 	api.Get("/profile", midAuth, userHandler.Profile)
+
+	api.Get("/limits", limitHandler.Get)
 
 	port := fmt.Sprintf(":%s", config.AppPort)
 	log.Println("Server is running on port ", config.AppPort)
